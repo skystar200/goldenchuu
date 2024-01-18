@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <header>
+    <h1><%= pageTitle %></h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <div>
+      <h2>좌석 테이블</h2>
+      <table id="seat-table">
+        <!-- 좌석 테이블이 여기에 동적으로 추가될 것입니다. -->
+      </table>
+    </div>
+    
+    <section id="seat-table">
+      <!-- 좌석 테이블 생성을 위한 내용 -->
+      <script>
+        // JavaScript 코드를 여기에 포함해도 됩니다.
+        function generateSeatTable() {
+          const seatTable = document.getElementById('seat-table');
+          const uniqueRows = [...new Set(seats.map(seat => seat.row))];
+
+          uniqueRows.forEach(row => {
+            const tr = document.createElement('tr');
+
+            // Filter seats for the current row
+            const rowSeats = seats.filter(seat => seat.row === row);
+
+            rowSeats.forEach(seat => {
+              const td = document.createElement('td');
+              td.textContent = `${seat.row}${seat.column}`;
+              td.className = seat.status;
+
+              // 클릭 이벤트 추가
+              if (seat.status === 'available') {
+                td.addEventListener('click', () => reserveSeat(seat));
+              }
+
+              tr.appendChild(td);
+            });
+
+            seatTable.appendChild(tr);
+          });
+        }
+
+        // 좌석 예약 함수
+        function reserveSeat(seat) {
+          const selectedTicket = document.getElementById('selected-ticket');
+          const quantity = document.getElementById('quantity').value;
+
+          if (!selectedTicket) {
+            alert('티켓을 선택해주세요.');
+            return;
+          }
+
+          // 여기에서 선택한 좌석에 대한 로직 추가 가능
+          // 현재는 간단히 알림만 표시
+          alert(`선택한 좌석: ${seat.row}${seat.column}, 수량: ${quantity}`);
+        }
+
+        // 티켓 목록 및 좌석 테이블 생성
+        generateSeatTable();
+      </script>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Ticketing Website</p>
+  </footer>
+</body>
+</html>

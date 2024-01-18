@@ -1,0 +1,47 @@
+<!-- views/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticketing Website</title>
+  <link rel="stylesheet" href="ticketing-web/public/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Welcome to our Ticketing Website</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="events">
+      <h2>티켓 목록</h2>
+      <% if (events.length > 0) { %>
+        <ul>
+          <% events.forEach(event => { %>
+            <li>
+              <h3><%= event.name %></h3>
+              <p><%= event.date %></p>
+              <p><%= event.title %></p>
+              <a href="/events/<%= event.id %>">Details</a>
+            </li>
+          <% }); %>
+        </ul>
+      <% } else { %>
+        <p>No upcoming events</p>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Ticketing Website</p>
+  </footer>
+</body>
+</html>

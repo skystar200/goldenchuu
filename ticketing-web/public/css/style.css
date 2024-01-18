@@ -1,0 +1,26 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    border: 1px solid #1900ff;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  .available {
+    background-color: #c0e2a0;
+    cursor: pointer;
+  }
+  
+  .selected {
+    background-color: #a6a6a6;
+    cursor: not-allowed;
+  }
+  

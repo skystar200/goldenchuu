@@ -1,0 +1,51 @@
+<!-- views/login.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <header>
+    <h1><%= pageTitle %></h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="login-container">
+      <h2>로그인</h2>
+      <label for="username">사용자명:</label>
+      <input type="text" id="username" required>
+      <label for="password">비밀번호:</label>
+      <input type="password" id="password" required>
+      <button onclick="login()">로그인</button>
+    </section>
+
+    <section id="join-container">
+      <h2>회원가입</h2>
+      <li><a href="/join">회원가입</a></li>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Ticketing Website</p>
+  </footer>
+
+  <script>
+    // JavaScript 함수 정의
+    function login() {
+      // 여기에 로그인 처리를 위한 JavaScript 코드를 추가
+      console.log('로그인 버튼이 클릭되었습니다.');
+    }
+  </script>
+</body>
+</html>
