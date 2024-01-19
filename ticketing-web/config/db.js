@@ -3,10 +3,10 @@
 // const mysql = require('mysql');
 import mysql from 'mysql';
 const dbInfo = {
-    host: 'localhost',
-    user: 'root',
-    password: 'kyk12050713~',
-    database: 'ticketing_web',
+    host: '',
+    user: '',
+    password: '',
+    database: '',
 };
 
 // connection 변수 선언 및 초기화
