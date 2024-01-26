@@ -1,7 +1,7 @@
 // db.js
 // @ts-nocheck
-// const mysql = require('mysql');
-import mysql from 'mysql';
+const mysql = require('mysql');
+const util = require('util');
 const dbInfo = {
     host: '',
     user: '',
@@ -21,9 +21,9 @@ connection.connect((err) => {
     console.log('Connected to MySQL as id ' + connection.threadId);
   });
 //모듈로 내보내기
-// module.exports= connection ;
-export default connection;
-// ->es 모듈 스타일로 변경한 것
+const query = util.promisify(connection.query).bind(connection);
+module.exports= connection ;
+
 
 // module.exports = {
 //     init: function() {

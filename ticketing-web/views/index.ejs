@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ticketing Website</title>
-  <link rel="stylesheet" href="ticketing-web/public/css/style.css">
+  <link rel="stylesheet" href="/public/css/style.css">
 </head>
 <body>
   <header>
@@ -15,7 +15,13 @@
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/events">Events</a></li>
-        <li><a href="/login">Login</a></li>
+        <!-- 로그인 상태에 따라 다르게 표시 -->
+        <% if (user) { %>
+          <li><p>안녕하세요, <%= user.userName %>님!</p></li>
+          <li><a href="/logout">로그아웃</a></li>
+        <% } else { %>
+          <li><a href="/login">Login</a></li>
+        <% } %>
       </ul>
     </nav>
   </header>

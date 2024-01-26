@@ -23,8 +23,8 @@
   <main>
     <section id="login-container">
       <h2>로그인</h2>
-      <label for="username">사용자명:</label>
-      <input type="text" id="username" required>
+      <label for="userName">사용자명:</label>
+      <input type="text" id="userName" required>
       <label for="password">비밀번호:</label>
       <input type="password" id="password" required>
       <button onclick="login()">로그인</button>
@@ -44,8 +44,29 @@
     // JavaScript 함수 정의
     function login() {
       // 여기에 로그인 처리를 위한 JavaScript 코드를 추가
+      const userName = document.getElementById('userName').value;
+      const password = document.getElementById('password').value;
       console.log('로그인 버튼이 클릭되었습니다.');
-    }
+       // AJAX 또는 Fetch API를 사용하여 서버에 로그인 정보 전송
+    fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userName, password }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('로그인이 완료되었습니다.');
+          window.location.href = '/';
+        } else {
+          alert('사용자명 또는 비밀번호가 올바르지 않습니다.');
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+    
   </script>
 </body>
 </html>

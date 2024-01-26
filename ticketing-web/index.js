@@ -1,154 +1,249 @@
-import express from 'express';
-const app = express();
-import bcrypt from 'bcrypt';
-//비밀번호 해싱을 위한 모듈 
-// body-parser를 사용하여 POST 데이터 파싱
-import connection from './config/db.js';
-
-// db.js 모듈 가져오기
-app.use(express.urlencoded({ extended: true }));
-
-
-// 로그인 페이지 렌더링
-app.get('/login', (req, res) => {
-  res.render('login', { pageTitle: 'Login' });
-});
-
-// 회원가입 페이지 렌더링
-app.get('/join', async (req, res) => {
-  res.render('join', {pageTitle: 'Join'});
-
-});
-
-
-// // 회원가입 데이터 삽입 api
-// app.post('/join', async function (req, res) {
-//   // const body = req.body;
-//   try {
-//     const body = req.body;  
-//      // 필요한 데이터가 있는지 확인
-//     if (!body || !body.password) {
-//       console.log('Invalid form data. Password is missing.');
-//       res.status(400).send('Bad Request');
-//       return;
-//     }
-
-//     // 비밀번호 해싱
-//     const hashedPassword = await bcrypt.hash(body.password, 10);
-
-//     // 데이터베이스에 회원 정보 삽입
-//     const sql = 'INSERT INTO users (id, username, email, password) VALUES (?, ?, ?, ?)';
-//     const params = [body.id, body.username, body.email, hashedPassword];
-
-//     // 데이터베이스 연결 확인
-//     if (!req.conn) {
-//       console.log('Database connection is not established.');
-//       res.status(500).send('Internal Server Error');
-//       return;
-//     }
-
-//     req.conn.query(sql, params, function (err) {
-//       if (err) {
-//         console.log('Query is not executed. Insert failed...\n' + err);
-//         res.status(500).send('Internal Server Error');
-//         return;
-//       }
-
-//       console.log('User registered successfully');
-//       res.redirect('/users'); // 회원가입 성공 시 회원 목록 페이지로 리다이렉트
-//     });
-//   } catch (error) {
-//     console.error('Error hashing password: ' + error.message);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
-
-// // 회원 목록 조회 API
-// app.get('/users', function (req, res) {
-//   const sql = 'SELECT * FROM users';
-//   req.conn.query(sql, function (err, rows, fields) {
-//     if (err) console.log('Query is not executed. Select failed...\n' + err);
-//     else res.render(__dirname + '/view/users.ejs', { list: rows });
-//   });
-// });
-
-connection.query('SELECT * FROM users', (err, results) => {
-  if (err) {
-    console.error('Error executing SELECT query: ' + err.stack);
-    return;
-  }
-  console.log('Query results:', results);
-});
-
-
-// 
-app.post('/join', (req, res) => {
-  console.log("registeruser");
-  const { id, username, email, password} = req.body;
-  console.log(`Received data: ${JSON.stringify(req.body)}`);
-  // SQL 쿼리 작성
-  const sql = `INSERT INTO users (id, username, email, password) VALUES (?, ?,?, ?)`;
-  // 쿼리 실행
-  connection.query(sql, [id,username, email, password], (error, userResults) => {
-      if (error) {
-          console.error(error); // 에러 메시지를 콘솔에 출력
-          res.status(500).send(error.message);
-          return;
-      }
-      // // 생성된 회원의 ID
-      // const id = userResults.insertId;
-      // // userStatus 테이블에 데이터 삽입
-      // const userStatusSql = `INSERT INTO userStatus (user_id, status, clinic, doctor_name, createdAt) VALUES (?, ?, ?, ?, ?)`;
-      // // 예시 데이터 - 실제 상황에 맞게 수정 필요
-      // const status = 0; // 상태 코드
-      // const clinic = "A1"; // 진료실
-      // const doctorName = "홍길동"; // 의사 이름
-      // connection.query(userStatusSql, [newuserId, status, clinic, doctorName, getDatetime()], (userStatusError, userStatusResults) => {
-      //     if (userStatusError) {
-      //         res.status(500).send(userStatusError.message);
-      //         return;
-      //     }
-      res.status(200).send('신규 회원이 등록되었습니다.');
-      });
-      
+  const express = require('express');
+  const app = express();
+  const path = require('path');
+  const { fileURLToPath } = require('url');
+  const { dirname } = require('path');
+  const bcrypt = require('bcrypt');
+  const connection = require('./config/db.js');
+  const session = require('express-session');
+  const bodyParser = require('body-parser');
+  const ejs = require('ejs');
+  //socket.io 설정
+  const http = require('http');
+  const socketIO = require('socket.io');
+  const Server = http.createServer(app);
+  const io = socketIO(Server);
   
-});
+  app.use('/public/js/socket.io-client', express.static(path.join(__dirname, 'node_modules/socket.io-client/dist')));
+  // CORS 설정
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    next();
+  }); 
+
+  //세션 초기화
+  app.use(session({
+    secret: 'my key', // 암호화에 사용되는 비밀 키, 보안에 중요
+    resave: false,
+    saveUninitialized: true,
+  }));
+
+  const cors = require('cors');
+  app.use(cors());
+
+  // 좌석예매 /seats 관련
+  // 좌석 정보
+  app.use(express.static('public'));
+  //미들웨어를 사용하여 정적 파일을 서빙할때 MIME 타입을 설정할 수 있다.
+  app.use('/public', express.static(path.join(__dirname, 'public'), { 
+    setHeader: (res, path, stat) => {
+      if (path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    },
+  }));
+
+
+  const seats = [];
+  const selectedSeats = new Set();
+  // 좌석 초기화
+  const totalSeats = 50;
+  for (let i = 1; i <= totalSeats; i++) {
+    seats.push({
+      id: i,
+      status: 'available', // 'available', 'selected', 'sold'
+    });
+  }
+
+  app.get('/seats', (req, res) => {
+    res.render('seats', { pageTitle: '좌석' });
+  });
+
+
+  // 정적 파일 서빙
+  // app.use('/public', express.static(path.join(__dirname, 'public')));
+  io.on('connection', (socket) => {
+
+    // 클라이언트에 좌석 정보 전송
+    socket.emit('seats', seats);
+
+    // 좌석 선택 이벤트 처리
+    socket.on('seatSelected', (seatId) => {
+      const selectedSeat = seats.find((seat) => seat.id === seatId);
+
+      if (selectedSeat && selectedSeat.status === 'available') {
+        selectedSeat.status = 'selected';
+        selectedSeats.add(seatId);
+
+        // 클라이언트에 선택된 좌석 정보 전송
+        io.emit('seats', seats);
+      }
+    }); 
+
+    //예매 완료 이벤트 처리
+    socket.on('checkout', () => {
+      // 여기에서 결제 로직을 처리할 수 있습니다.
+
+      // 판매 완료된 좌석 상태 업데이트
+      selectedSeats.forEach((seatId) => {
+        const soldSeat = seats.find((seat) => seat.id === seatId);
+        if (soldSeat) {
+          soldSeat.status = 'sold';
+        }
+      });
+
+      // 클라이언트에 업데이트된 좌석 정보 전송
+      io.emit('seats', seats);
+
+      // 선택된 좌석 초기화
+      selectedSeats.clear();
+    });
+  });
+
+
+  // 로그인 페이지 렌더링
+  app.get('/login', (req, res) => {
+    res.render('login', { pageTitle: 'Login' });
+  });
+
+  // JSON 파싱을 위한 미들웨어
+  app.use(express.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+
+//로그인
+  app.post('/login', (req, res) => {
+    const { userName, password } = req.body;
+
+    // 데이터베이스에서 사용자 정보 확인 및 로그인 처리
+    const query = 'SELECT * FROM users WHERE userName = ? AND password = ?';
+
+    connection.query(query, [userName, password], (err, results) => {
+      if (err) {
+        console.error('쿼리 오류:', err);
+        res.json({ success: false, message: '로그인 중 오류가 발생했습니다.' });
+        return;
+      }
+
+      if (results.length > 0) {
+        // 세션 객체 초기화
+        req.session = req.session || {};
+        // 로그인 성공 시 사용자 정보를 세션에 저장
+        req.session.user = {
+          userId: results[0].userId,
+          // password: results[0].password,
+          email: results[0].email,
+          userName: results[0].userName,
+          phone: results[0].phone
+          
+          
+          // 다른 필요한 정보들을 추가할 수 있음
+        };
+        res.json({ success: true, message: '로그인이 완료되었습니다.' });
+        
+      } else {
+        res.json({ success: false, message: '사용자명 또는 비밀번호가 올바르지 않습니다.' });
+      }
+
+    });
+  });
+  //로그아웃
+  app.get('/logout', (req, res) => {
+    // 세션에서 사용자 정보 삭제
+    req.session.destroy((err) => {
+      if (err) {
+        console.log('세션 삭제 중 에러 발생:', err);
+      }
+      // 로그아웃 후 로그인 페이지로 리다이렉션
+      res.redirect('/login');
+    });
+  });
+
+  // 회원가입 페이지 렌더링
+  app.get('/join', async (req, res) => {
+    res.render('join', {pageTitle: 'Join'});
+
+  });
+
+  connection.query('SELECT * FROM users', (err, results) => {
+    if (err) {
+      console.error('Error executing SELECT query: ' + err.stack);
+      return;
+    }
+    console.log('Query results:', results);
+  });
+
+
+  // 회원가입
+  app.post('/join', (req, res) => {
+    console.log("registeruser");
+    const { userId, password, email, userName, phone} = req.body;
+    console.log(`Received data: ${JSON.stringify(req.body)}`);
+    // SQL 쿼리 작성
+    const sql = `INSERT INTO users (userId, password, email, userName, phone) VALUES (?, ?,?, ?,?)`;
+    // 쿼리 실행
+    connection.query(sql, [userId, password, email, userName, phone], (error, userResults) => {
+        if (error) {
+            console.error(error); // 에러 메시지를 콘솔에 출력
+            res.status(500).send(error.message); 
+            return;
+        }
+        res.status(200).send('신규 회원이 등록되었습니다.');
+        res.redirect('/login');
+        });
+        
+    
+  });
+
+
+  // 이벤트 디테일
+  app.get('/events', (req, res) => {
+    res.render('events-1', { pageTitle: 'Details' });
+  });
+
+  app.get('/bookTicket', (req, res) => {
+    // 여기서 로그인 상태를 확인
+    if (req.session && req.session.user) {
+      // 로그인 상태일 경우 예매 페이지로 리다이렉션
+      res.redirect('/seats');
+    } else {
+      // 로그인되어 있지 않을 경우 로그인 페이지로 리다이렉션
+      res.redirect('/login');
+    }
+  });
+
+
+
+
+  // EJS 템플릿 엔진 설정
+  app.engine('ejs', ejs.renderFile);
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
 
 
 
 
 
+  app.get('/', (req, res) => {
+    // 렌더링할 데이터를 객체로 전달
+    const data = {
+      pageTitle: '티켓팅 웹사이트',
+      events: [
+        { name: '이벤트1', date: '2024-01-13', title: '길' },
+        { name: '이벤트2', date: '2024-06-30', title: '"우쥬"대스타의 팬미팅' },
+        // 추가 이벤트들...
+      ],
+      user: req.session.user,
+    };
 
+    // index.ejs 템플릿을 렌더링하고, 데이터를 전달
+    res.render('index', data);
+  });
 
-// 이벤트 디테일
-app.get('/events', (req, res) => {
-  res.render('events-1', { pageTitle: 'Details' });
-});
-
-// 좌석 보고 예매하는 페이지
-app.get('/seats', (req, res) => {
-  res.render('seats', { pageTitle: 'Seats'});
-});
-
-// EJS 템플릿 엔진 설정
-app.set('view engine', 'ejs');
-
-app.get('/', (req, res) => {
-  // 렌더링할 데이터를 객체로 전달
-  const data = {
-    pageTitle: '티켓팅 웹사이트',
-    events: [
-      { name: '이벤트1', date: '2024-01-13', title: '길' },
-      { name: '이벤트2', date: '2024-06-30', title: '용환이의 생일잔치' },
-      // 추가 이벤트들...
-    ]
-  };
-
-  // index.ejs 템플릿을 렌더링하고, 데이터를 전달
-  res.render('index', data);
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("백엔드 API 서버가 켜졌어요!!!");
-});
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log("백엔드 API 서버가 켜졌어요!!!");
+  });
