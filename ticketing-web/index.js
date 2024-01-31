@@ -13,10 +13,9 @@
   const socketIO = require('socket.io');
   const Server = http.createServer(app);
   const io = socketIO(Server);
-  const { popSeat } = require('./config/redis');
-  // const { run } = require('./config/redis');
-  // const redis = require('redis');
-  // const fetch = require('node-fetch');
+  // const { popSeat } = require('./config/redis');
+
+
   const axios = require('axios');
 
   app.use('/public/js/socket.io-client', express.static(path.join(__dirname, 'node_modules/socket.io-client/dist')));
