@@ -6,35 +6,23 @@
   <title><%= pageTitle %></title>
   <link rel="stylesheet" href="../public/css/style.css">
   <style>
-    #seat-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-    }
     .seat {
-      width: 30px;
-      height: 30px;
+      display: inline-block;
+      width: 50px;
+      height: 50px;
       margin: 5px;
+      background-color: #ccc;
       cursor: pointer;
+      border-radius: 5px;
+      text-align: center;
+      line-height: 50px;
     }
 
-    .enable {
-      background-color: lightgreen; /* 남은 좌석은 초록색으로 표시 */
+    .seat.selected {
+      background-color: #ff0000; /* 선택된 좌석 색상 */
+      color: #fff; /* 선택된 좌석 텍스트 색상 */
     }
 
-    .selected {
-      background-color: red; /* 선택한 좌석은 빨간색으로 표시 */
-    }
-
-    .disable {
-      background-color: lightgrey; /* 판매된 좌석은 회색으로 표시 */
-      cursor: not-allowed;
-    }
-
-    .line {
-      flex-basis: 100%;
-      height: 5px;
-    }
   </style>
 
 </head>
@@ -54,13 +42,90 @@
     <section id="seat-table">
       <!-- 좌석 테이블 생성을 위한 내용 -->
       <h2>좌석 테이블</h2>
-      <div id="seat-container"></div>
+      <div id="seat-container">
+        <!-- <% for(let i = 0; i < 10; i++) { %>
+          <div class="seat" data-seat="<%= i %>">A<%= i+1 %></div>
+        <% } %> for문으로 A1, 2, 3,,, 만드는 것 --> 
+        <div class="seat" data-seat="A"> A </div>
+        
+      </div>
+
     </section>   
     
-    <!-- <script type="module" src="../public/js/socket.io-client/dist/socket.io.js"></script> -->
-    <script type="module" src="/public/js/socket.io-client/dist/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const seatContainer = document.getElementById('seat-container');
+      
+      seatContainer.addEventListener('click', async (event) => {
+      if (event.target.classList.contains('seat')) {
+        const seat = event.target.getAttribute('data-seat');
+        if (seat) {
+          try {
+            const response = await axios.get(`/get-seat-data/${seat}`);
+            //{
+            //   method: 'GET',
+            //   headers: {
+            //     'Content-Type': 'application/json'
+            //   },
+            //   body: JSON.stringify({ seat: `${seat}-sector` })
+            //   // body: JSON.stringify({ seat: `test-key` })
+            // });
 
-    <script type="module" src="/public/js/seats.js"></script>
+            if (response.status === 200) {
+              const data = response.data.data; // 수정된 부분
+                console.log('Data from Flask Server:', data);
+                alert(`Redis에서 받아온 데이터: ${data}`);
+                event.target.classList.toggle('selected');
+              } else {
+                console.error('Failed to get seat data from Flask Server.');
+              }
+            } catch (error) {
+              console.error('Error sending get-seat-data request to Flask Server:', error);
+            }
+          }
+        }
+    });
+
+
+
+
+    //  // Redis 클라이언트 실행 함수 가져오기
+    //  async function runRedisClient() {
+    //     const response = await fetch('/pop-seat', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json'
+    //       },
+    //       body: JSON.stringify({ seat: `test-key` })
+    //     });
+
+    //     if (response.ok) {
+    //       const data = await response.text();
+    //       // console.log(data); // 서버에서 받아온 결과 출력
+    //       alert(`Redis에서 받아온 데이터: ${data}`);
+    //       // 여기서 좌석 표시 등의 UI 업데이트 작업을 수행할 수 있습니다.
+    //     } else {
+    //       console.error('Failed to pop seat from Redis.');
+    //     }
+    //   }
+
+    //   // 좌석 클릭 이벤트 핸들러
+    //   const seatContainer = document.getElementById('seat-container');
+      
+    //   seatContainer.addEventListener('click', async (event) => {
+    //     if (event.target.classList.contains('seat')) {
+    //       const seat = event.target.getAttribute('data-seat');
+    //       if (seat) {
+    //         try {
+    //           await runRedisClient(); // Redis 클라이언트 실행
+    //           event.target.classList.toggle('selected');
+    //         } catch (error) {
+    //           console.error('Error sending pop-seat request:', error);
+    //         }
+    //       }
+    //     }
+    //   });
+    </script>
       <!-- export { updateSeatsUI }; -->
       <!-- //브라우저 환경에서는 commonJS 스타일의 export를 사용할 수 없다. -->
 

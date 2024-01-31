@@ -13,7 +13,12 @@
   const socketIO = require('socket.io');
   const Server = http.createServer(app);
   const io = socketIO(Server);
-  
+  const { popSeat } = require('./config/redis');
+  // const { run } = require('./config/redis');
+  // const redis = require('redis');
+  // const fetch = require('node-fetch');
+  const axios = require('axios');
+
   app.use('/public/js/socket.io-client', express.static(path.join(__dirname, 'node_modules/socket.io-client/dist')));
   // CORS 설정
   app.use((req, res, next) => {
@@ -242,6 +247,58 @@
     // index.ejs 템플릿을 렌더링하고, 데이터를 전달
     res.render('index', data);
   });
+
+
+
+// app.post('/pop-seat',(req, res) => {
+//   popSeat()
+//     .then(result => {
+//       console.log(`Seat ${result} popped from Redis.`);
+//       // 결과를 사용하여 다른 작업을 수행합니다.
+//       res.status(200).send(`Seat ${result} popped from Redis.`);
+//     })
+//     .catch(error => {
+//       console.error('Failed to pop seat from Redis:', error);
+//       // 오류를 처리합니다.
+//       res.status(500).send('Failed to pop seat from Redis.');
+//     });
+// });
+app.post('/pop-seat', async (req, res) => {
+  try {
+    const selectedSeat = req.body.seat; // 클라이언트에서 선택한 좌석
+    const sector = selectedSeat.split('-')[0]; // 좌석에서 섹터 부분 추출
+    const response = await axios.get(`http://localhost:5000/get-seat-data/${sector}`);
+    
+    if (response.status === 200) {
+      const data = response.data;
+      console.log('Data from Flask Server:', data);
+      // 여기서 좌석 데이터를 사용하여 다른 작업을 수행할 수 있습니다.
+      res.status(200).json(data);
+    } else {
+      console.error('Failed to get seat data from Flask Server.');
+      res.status(500).send('Failed to get seat data from Flask Server.');
+    }
+  } catch (error) {
+    console.error('Error sending get-seat-data request to Flask Server:', error);
+    res.status(500).send('Error sending get-seat-data request to Flask Server.');
+  }
+});
+
+app.get('/get-seat-data/:seat', async (req, res) => {
+  try {
+    const seat = req.params.seat;
+    const response = await axios.get(`http://localhost:5000/get-seat-data/${seat}`);
+    const data = response.data;
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error fetching seat data:', error);
+    res.status(500).send('Error fetching seat data.');
+  }
+});
+
+ 
+
+
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
