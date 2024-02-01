@@ -120,12 +120,12 @@
 
 //로그인
   app.post('/login', (req, res) => {
-    const { userName, password } = req.body;
+    const { userId, password } = req.body;
 
     // 데이터베이스에서 사용자 정보 확인 및 로그인 처리
-    const query = 'SELECT * FROM users WHERE userName = ? AND password = ?';
+    const query = 'SELECT * FROM users WHERE userId = ? AND password = ?';
 
-    connection.query(query, [userName, password], (err, results) => {
+    connection.query(query, [userId, password], (err, results) => {
       if (err) {
         console.error('쿼리 오류:', err);
         res.json({ success: false, message: '로그인 중 오류가 발생했습니다.' });
@@ -195,7 +195,7 @@
             res.status(500).send(error.message); 
             return;
         }
-        res.status(200).send('신규 회원이 등록되었습니다.');
+        // res.status(200).send('회원가입 완료!');
         res.redirect('/login');
         });
         
@@ -249,51 +249,58 @@
 
 
 
-// app.post('/pop-seat',(req, res) => {
-//   popSeat()
-//     .then(result => {
-//       console.log(`Seat ${result} popped from Redis.`);
-//       // 결과를 사용하여 다른 작업을 수행합니다.
-//       res.status(200).send(`Seat ${result} popped from Redis.`);
-//     })
-//     .catch(error => {
-//       console.error('Failed to pop seat from Redis:', error);
-//       // 오류를 처리합니다.
-//       res.status(500).send('Failed to pop seat from Redis.');
-//     });
-// });
-app.post('/pop-seat', async (req, res) => {
-  try {
-    const selectedSeat = req.body.seat; // 클라이언트에서 선택한 좌석
-    const sector = selectedSeat.split('-')[0]; // 좌석에서 섹터 부분 추출
-    const response = await axios.get(`http://localhost:5000/get-seat-data/${sector}`);
-    
-    if (response.status === 200) {
-      const data = response.data;
-      console.log('Data from Flask Server:', data);
-      // 여기서 좌석 데이터를 사용하여 다른 작업을 수행할 수 있습니다.
-      res.status(200).json(data);
-    } else {
-      console.error('Failed to get seat data from Flask Server.');
-      res.status(500).send('Failed to get seat data from Flask Server.');
+  app.post('/pop-seat', async (req, res) => {
+    try {
+      const selectedSeat = req.body.seat; // 클라이언트에서 선택한 좌석
+      const sector = selectedSeat.split('-')[0]; // 좌석에서 섹터 부분 추출
+      const response = await axios.get(`http://localhost:5000/get-seat-data/${sector}`);
+      
+      if (response.status === 200) {
+        const data = response.data;
+        console.log('Data from Flask Server:', data);
+        // 여기서 좌석 데이터를 사용하여 다른 작업을 수행할 수 있습니다.
+        res.status(200).json(data);
+      } else {
+        console.error('Failed to get seat data from Flask Server.');
+        res.status(500).send('Failed to get seat data from Flask Server.');
+      }
+    } catch (error) {
+      console.error('Error sending get-seat-data request to Flask Server:', error);
+      res.status(500).send('Error sending get-seat-data request to Flask Server.');
     }
-  } catch (error) {
-    console.error('Error sending get-seat-data request to Flask Server:', error);
-    res.status(500).send('Error sending get-seat-data request to Flask Server.');
-  }
-});
+  });
 
-app.get('/get-seat-data/:seat', async (req, res) => {
-  try {
-    const seat = req.params.seat;
-    const response = await axios.get(`http://localhost:5000/get-seat-data/${seat}`);
-    const data = response.data;
-    res.status(200).json(data);
-  } catch (error) {
-    console.error('Error fetching seat data:', error);
-    res.status(500).send('Error fetching seat data.');
+  app.get('/get-seat-data/:seat', async (req, res) => {
+    try {
+      const seat = req.params.seat;
+      const response = await axios.get(`http://localhost:5000/get-seat-data/${seat}`);
+      const data = response.data;
+      res.status(200).json(data);
+    } catch (error) {
+      console.error('Error fetching seat data:', error);
+      res.status(500).send('Error fetching seat data.');
+    }
+  });
+
+  app.get('/bookTicket', (req, res) => {
+    // 세션에 사용자 정보가 있는지 확인
+    // if (req.session.user) {
+    //   // 사용자가 로그인한 경우
+    //   res.redirect('/seats'); // 예매 페이지로 리다이렉션
+    // } else {
+    //   // 사용자가 로그인하지 않은 경우
+    //   // res.redirect('/login'); // 로그인 페이지로 리다이렉션
+    //   res.status(401).send('Unauthorized')
+    // }
+    if (req.session.user) {
+      // 사용자가 로그인한 경우
+      res.sendStatus(200); // 예매 처리 성공 응답 (200 OK)
+  } else {
+      // 사용자가 로그인하지 않은 경우
+      res.sendStatus(401); // 인증되지 않음 응답 (401 Unauthorized)
   }
-});
+  });
+
 
  
 
