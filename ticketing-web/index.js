@@ -5,6 +5,7 @@
   const { dirname } = require('path');
   const bcrypt = require('bcrypt');
   const connection = require('./config/db.js');
+
   const session = require('express-session');
   const bodyParser = require('body-parser');
   const ejs = require('ejs');
@@ -13,11 +14,19 @@
   const socketIO = require('socket.io');
   const Server = http.createServer(app);
   const io = socketIO(Server);
-  // const { popSeat } = require('./config/redis');
-
-
+  // const jwt = require('jsonwebtoken'); // JWT 토큰 모듈 추가
+  const passport = require('./src/auth/passport');
   const axios = require('axios');
+  const jwt = require('jsonwebtoken');
+  const LocalStrategy = require('passport-local').Strategy;
+  const cookieParser = require('cookie-parser');
+  
 
+  // EJS 템플릿 엔진 설정
+  app.engine('ejs', ejs.renderFile);
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
+  
   app.use('/public/js/socket.io-client', express.static(path.join(__dirname, 'node_modules/socket.io-client/dist')));
   // CORS 설정
   app.use((req, res, next) => {
@@ -33,11 +42,59 @@
     saveUninitialized: true,
   }));
 
+  // Express 애플리케이션에 Passport 초기화 및 세션 설정
+  app.use(require('express-session')({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+  }));
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // 사용자 인증을 위한 미들웨어 정의
+  function isAuthenticated(req, res, next) {
+    if (req.cookies && req.cookies.access_token) { // 쿠키가 존재하는지 확인
+      const accessToken = req.cookies.access_token;
+      
+      try {
+        // 토큰 검증
+        const decoded = jwt.verify(accessToken, 'test_key'); // 발급할 때 사용한 비밀 키와 동일해야 함
+        
+        // 토큰에서 추출한 사용자 아이디
+        const userId = decoded.userId;
+  
+        // 데이터베이스에서 해당 사용자 정보 가져오기
+        const query = 'SELECT * FROM users WHERE userId = ?';
+        connection.query(query, [userId], (err, results) => {
+          if (err) {
+            console.error('쿼리 오류:', err);
+            res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+            return;
+          }
+  
+          if (results.length > 0) {
+            // 사용자 정보가 일치하는 경우
+            req.user = results[0]; // 요청 객체에 사용자 정보 추가
+            next(); // 다음 미들웨어로 이동
+          } else {
+            // 사용자 정보가 일치하지 않는 경우
+            res.status(401).json({ success: false, message: '사용자 정보가 일치하지 않습니다.' });
+          }
+        });
+      } catch (error) {
+        // 토큰이 유효하지 않은 경우
+        res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });
+        
+      }
+    } else {
+      res.redirect('/login'); // 쿠키가 없는 경우 로그인 페이지로 리다이렉션
+    }
+  }
+
   const cors = require('cors');
   app.use(cors());
 
-  // 좌석예매 /seats 관련
-  // 좌석 정보
+
   app.use(express.static('public'));
   //미들웨어를 사용하여 정적 파일을 서빙할때 MIME 타입을 설정할 수 있다.
   app.use('/public', express.static(path.join(__dirname, 'public'), { 
@@ -50,21 +107,21 @@
     },
   }));
 
+  // app.get('/seats', (req, res) => {
+  //   res.render('seats', { pageTitle: '좌석' });
+  // });
 
-  const seats = [];
-  const selectedSeats = new Set();
-  // 좌석 초기화
-  const totalSeats = 50;
-  for (let i = 1; i <= totalSeats; i++) {
-    seats.push({
-      id: i,
-      status: 'available', // 'available', 'selected', 'sold'
-    });
-  }
+  // app.get('/seats', isAuthenticated, (req, res) => {
+  //   res.render('seats', { pageTitle: '좌석' });
+  // });
 
   app.get('/seats', (req, res) => {
-    res.render('seats', { pageTitle: '좌석' });
-  });
+    // 페이지 제목을 변수에 저장
+    const pageTitle = "좌석";
+    // 렌더링 시 pageTitle 변수를 전달
+    res.render('seats', { pageTitle });
+});
+
 
 
   // 정적 파일 서빙
@@ -117,6 +174,7 @@
   app.use(express.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
+  app.use(cookieParser());
 
 //로그인
   app.post('/login', (req, res) => {
@@ -142,10 +200,12 @@
           email: results[0].email,
           userName: results[0].userName,
           phone: results[0].phone
-          
-          
-          // 다른 필요한 정보들을 추가할 수 있음
+
         };
+        //JWT 토큰 발급
+        const accessToken = jwt.sign(req.session.user, 'test_key'); // 토큰에 담길 정보와 비밀 키 전달
+        // 발급한 토큰을 쿠키에 저장
+        res.cookie('access_token', accessToken, { httpOnly: true }); // httpOnly 옵션은 JavaScript로 쿠키에 접근할 수 없도록 설정
         res.json({ success: true, message: '로그인이 완료되었습니다.' });
         
       } else {
@@ -154,6 +214,17 @@
 
     });
   });
+
+
+  // 로그인 라우트에 Passport를 사용하여 로그인 인증 처리
+  app.post('/login', passport.authenticate('local', {
+    successRedirect: '/home', // 로그인 성공 시 이동할 경로
+    failureRedirect: '/login',     // 로그인 실패 시 이동할 경로
+    failureFlash: true             // 인증 실패 시 플래시 메시지 사용 여부
+  }));
+
+
+
   //로그아웃
   app.get('/logout', (req, res) => {
     // 세션에서 사용자 정보 삭제
@@ -207,27 +278,6 @@
   app.get('/events', (req, res) => {
     res.render('events-1', { pageTitle: 'Details' });
   });
-
-  app.get('/bookTicket', (req, res) => {
-    // 여기서 로그인 상태를 확인
-    if (req.session && req.session.user) {
-      // 로그인 상태일 경우 예매 페이지로 리다이렉션
-      res.redirect('/seats');
-    } else {
-      // 로그인되어 있지 않을 경우 로그인 페이지로 리다이렉션
-      res.redirect('/login');
-    }
-  });
-
-
-
-
-  // EJS 템플릿 엔진 설정
-  app.engine('ejs', ejs.renderFile);
-  app.set('view engine', 'ejs');
-  app.set('views', path.join(__dirname, 'views'));
-
-
 
 
 
@@ -283,24 +333,27 @@
   });
 
   app.get('/bookTicket', (req, res) => {
-    // 세션에 사용자 정보가 있는지 확인
-    // if (req.session.user) {
-    //   // 사용자가 로그인한 경우
-    //   res.redirect('/seats'); // 예매 페이지로 리다이렉션
-    // } else {
-    //   // 사용자가 로그인하지 않은 경우
-    //   // res.redirect('/login'); // 로그인 페이지로 리다이렉션
-    //   res.status(401).send('Unauthorized')
-    // }
-    if (req.session.user) {
-      // 사용자가 로그인한 경우
-      res.sendStatus(200); // 예매 처리 성공 응답 (200 OK)
-  } else {
-      // 사용자가 로그인하지 않은 경우
-      res.sendStatus(401); // 인증되지 않음 응답 (401 Unauthorized)
-  }
+    const user = req.session.user;
+    if (user){
+      res.redirect('/seats');
+
+    }else {
+      res.redirect('/login');
+    }
   });
 
+  app.get('/profile', (req, res) => {
+    // 현재 세션에 저장된 사용자 정보 확인
+    const user = req.session.user;
+
+    if (user) {
+        // 사용자 정보가 세션에 저장되어 있으면 프로필 페이지 렌더링
+        res.render('profile', { user });
+    } else {
+        // 세션에 사용자 정보가 없으면 로그인 페이지로 리디렉션
+        res.redirect('/login');
+    }
+});
 
  
 

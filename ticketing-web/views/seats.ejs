@@ -87,44 +87,6 @@
     });
 
 
-
-
-    //  // Redis 클라이언트 실행 함수 가져오기
-    //  async function runRedisClient() {
-    //     const response = await fetch('/pop-seat', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json'
-    //       },
-    //       body: JSON.stringify({ seat: `test-key` })
-    //     });
-
-    //     if (response.ok) {
-    //       const data = await response.text();
-    //       // console.log(data); // 서버에서 받아온 결과 출력
-    //       alert(`Redis에서 받아온 데이터: ${data}`);
-    //       // 여기서 좌석 표시 등의 UI 업데이트 작업을 수행할 수 있습니다.
-    //     } else {
-    //       console.error('Failed to pop seat from Redis.');
-    //     }
-    //   }
-
-    //   // 좌석 클릭 이벤트 핸들러
-    //   const seatContainer = document.getElementById('seat-container');
-      
-    //   seatContainer.addEventListener('click', async (event) => {
-    //     if (event.target.classList.contains('seat')) {
-    //       const seat = event.target.getAttribute('data-seat');
-    //       if (seat) {
-    //         try {
-    //           await runRedisClient(); // Redis 클라이언트 실행
-    //           event.target.classList.toggle('selected');
-    //         } catch (error) {
-    //           console.error('Error sending pop-seat request:', error);
-    //         }
-    //       }
-    //     }
-    //   });
     </script>
       <!-- export { updateSeatsUI }; -->
       <!-- //브라우저 환경에서는 commonJS 스타일의 export를 사용할 수 없다. -->
