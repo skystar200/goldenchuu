@@ -1,101 +1,138 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= pageTitle %></title>
-  <link rel="stylesheet" href="../public/css/style.css">
-  <style>
-    .seat {
-      display: inline-block;
-      width: 50px;
-      height: 50px;
-      margin: 5px;
-      background-color: #ccc;
-      cursor: pointer;
-      border-radius: 5px;
-      text-align: center;
-      line-height: 50px;
-    }
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="../public/css/style.css">
+    <style>
+      .seat {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+        background-color: #ccc;
+        cursor: pointer;
+        border-radius: 5px;
+        text-align: center; 
+        line-height: 50px;
+      }
 
-    .seat.selected {
-      background-color: #ff0000; /* 선택된 좌석 색상 */
-      color: #fff; /* 선택된 좌석 텍스트 색상 */
-    }
+      .seat.selected {
+        background-color: #ff0000; /* 선택된 좌석 색상 */
+        color: #fff; /* 선택된 좌석 텍스트 색상 */
+      }
 
-  </style>
+    </style>
 
-</head>
-<body>
-  <header>
-    <h1><%= pageTitle %></h1>
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/events">Events</a></li>
-        <li><a href="/login">Login</a></li>
-      </ul>
-    </nav>
-  </header>
-  
-  <main>
-    <section id="seat-table">
-      <!-- 좌석 테이블 생성을 위한 내용 -->
-      <h2>좌석 테이블</h2>
-      <div id="seat-container">
-        <!-- <% for(let i = 0; i < 10; i++) { %>
-          <div class="seat" data-seat="<%= i %>">A<%= i+1 %></div>
-        <% } %> for문으로 A1, 2, 3,,, 만드는 것 --> 
-        <div class="seat" data-seat="A"> A </div>
-        
-      </div>
-
-    </section>   
+  </head>
+  <body>
+    <header>
+      <h1><%= pageTitle %></h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/events">Events</a></li>
+          <% if (user) { %>
+            <li><a href="/profile">MyPage</a></li>
+            <li><a href="/logout">Logout</a></li>
+          <% } else { %>
+            <li><a href="/login">Login</a></li>
+          <% } %>
+        </ul>
+      </nav>
+    </header>
     
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-      const seatContainer = document.getElementById('seat-container');
-      
-      seatContainer.addEventListener('click', async (event) => {
-      if (event.target.classList.contains('seat')) {
-        const seat = event.target.getAttribute('data-seat');
-        if (seat) {
-          try {
-            const response = await axios.get(`/get-seat-data/${seat}`);
-            //{
-            //   method: 'GET',
-            //   headers: {
-            //     'Content-Type': 'application/json'
-            //   },
-            //   body: JSON.stringify({ seat: `${seat}-sector` })
-            //   // body: JSON.stringify({ seat: `test-key` })
-            // });
+    <main>
+      <section id="seat-table">
+        <!-- 좌석 테이블 생성을 위한 내용 -->
+        <h2>좌석 테이블</h2>
+        <div id="seat-container">
+          <div class="seat" data-seat="A"> A </div>
+          <div class="seat" data-seat="B"> B </div>
+        </div>
 
-            if (response.status === 200) {
-              const data = response.data.data; // 수정된 부분
-                console.log('Data from Flask Server:', data);
-                alert(`Redis에서 받아온 데이터: ${data}`);
-                event.target.classList.toggle('selected');
-              } else {
-                console.error('Failed to get seat data from Flask Server.');
+      </section>   
+      
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script>
+        const seatContainer = document.getElementById('seat-container');
+        seatContainer.addEventListener('click', async (event) => {
+          if (event.target.classList.contains('seat')) {
+            const seat = event.target.getAttribute('data-seat');
+            const id = '<%= user.id %>';
+            console.log('Sector:', seat); 
+            if (seat) {
+              try {
+                // const id = '<%= user.id %>';
+                const response = await axios.get(`/get-seat-data/${seat}/${id}`);
+                if (response.status === 200) {
+                  const seat_id = response.data.seat_id;
+                  // console.log('Data from Flask Server:', data);
+                  console.log('Data from Flask Server:', seat_id);
+                  // if (data === null) {
+                  if (seat_id === null) {
+                    alert('예매 실패(매진)');
+                  } else if (seat_id == -1) {
+                    alert('예매 완료된 사용자입니다.');
+
+                  } else {
+                    const confirmed = window.confirm(`${seat_id} 를 예매하시겠습니까?`);
+                    if (confirmed) {
+                      event.target.classList.toggle('selected');
+                      window.location.href = '/booking-success';
+                      // alert('예매 성공 !');
+                    } else {
+                      alert('예매가 취소되었습니다.');
+                    }
+                  }
+                } else {
+                  console.error('Failed to get seat data from Flask Server.');
+                }
+              } catch (error) {
+                console.error('Error sending get-seat-data request to Flask Server:', error);
               }
-            } catch (error) {
-              console.error('Error sending get-seat-data request to Flask Server:', error);
             }
           }
+        });
+        function saveSeatData(id, seat_id) {
+          const url = '/save-seat-data';
+          const data = {
+            id: id,
+            seat_id: seat_id
+          };
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+          .then(response => {
+            if (response.ok) {
+              console.log('Data saved successfully');
+            } else {
+              console.error('Failed to save data');
+            }
+          })
+          .catch(error => {
+            console.error('Error occurred while saving data:', error);
+          });
         }
-    });
 
 
-    </script>
-      <!-- export { updateSeatsUI }; -->
-      <!-- //브라우저 환경에서는 commonJS 스타일의 export를 사용할 수 없다. -->
 
-      
-    </main>
 
-    <footer>
-      <p>&copy; 2024 Ticketing Website</p>
-  </footer>
-</body>
-</html>
+
+      </script>
+        <!-- export { updateSeatsUI }; -->
+        <!-- //브라우저 환경에서는 commonJS 스타일의 export를 사용할 수 없다. -->
+
+        
+      </main>
+
+      <footer>
+        <p>&copy; 2024 Ticketing Website</p>
+    </footer>
+  </body>
+  </html>

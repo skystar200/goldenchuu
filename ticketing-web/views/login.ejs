@@ -41,34 +41,6 @@
   </footer>
   
   <script>
-
-
-    // function login() {
-    //     const userId = document.getElementById('userId').value;
-    //     const password = document.getElementById('password').value;
-        
-    //     fetch('/login', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({ userId, password }),
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //       if (data.success) {
-    //         // 로그인이 성공하면 서버로부터 토큰을 받아 쿠키에 저장하고 메인 페이지로 이동
-    //         document.cookie = `access_token=${data.access_Token}; path=/;`;
-    //         alert('로그인이 완료되었습니다.');
-    //         window.location.href = '/';
-    //       } else {
-    //         alert('사용자명 또는 비밀번호가 올바르지 않습니다.');
-    //       }
-    //     })
-    //     .catch(error => console.error('Error:', error));
-    //   }
-
-
     
     function login() {
       // 여기에 로그인 처리를 위한 JavaScript 코드를 추가
@@ -87,7 +59,14 @@
       .then(data => {
         if (data.success) {
           alert('로그인이 완료되었습니다.');
-          window.location.href = '/';
+          // 현재 페이지 URL을 확인하고, 리다이렉션 수행
+          // window.location.href = '/';
+          const currentPageUrl = window.location.pathname;
+          if (currentPageUrl === '/events/login') {
+            window.location.href = '/seats';
+          } else {
+            window.location.href = '/';
+          }
         } else {
           alert('사용자명 또는 비밀번호가 올바르지 않습니다.');
         }

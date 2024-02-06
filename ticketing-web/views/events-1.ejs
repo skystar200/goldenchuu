@@ -5,16 +5,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ticketing detail</title>
-  <link rel="stylesheet" href="ticketing-web/public/css/style.css">
+  <link rel="stylesheet" href="/public/css/style.css">
 </head>
 <body>
   <header>
-    <h1>주영언니 데뷔작 뮤지컬 '길'</h1>
+    <img id="logo" src="/public/images/ver2_black.png" alt="Ticketing Website Logo">
+    
+    <h1>Welcome to our Ticketing Website</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/events">Events</a></li>
+        <!-- 로그인 상태에 따라 다르게 표시 -->
+        <% if (user) { %>
+          <li><a href="/profile">MyPage</a></li>
+          <li><a href="/logout">Logout</a></li>
+        <% } else { %>
+          <li><a href="/login">Login</a></li>
+        <% } %>
+      </ul>
+    </nav>
+
     
   </header>
   <main>
-    
+    <img id= "event-1" src="/public/images/길.gif" alt="event-title" style="float: left; margin-right: 10px;">
+    <h1>주영언니 데뷔작 뮤지컬 '길'</h1>
     <script>
+
       function bookTicket() {
         fetch('/bookTicket')
           .then(response => {
@@ -28,62 +46,6 @@
             console.error('Error occurred while fetching bookTicket endpoint:', error);
           });
       }
-
-
-
-      // function bookTicket() {
-      //   fetch('/bookTicket')
-      //     .then(response => {
-      //       if (response.ok) {
-      //         // 예매 페이지로 이동
-      //         window.location.href = '/seats';
-      //       } else if (response.status === 401) {
-      //         // 인증되지 않은 경우 로그인 페이지로 이동
-      //         window.location.href = '/login';
-      //       } else {
-      //         // 기타 다른 상태 코드에 대한 처리
-      //         console.error('Error:', response.statusText);
-      //       }
-      //     })
-      //     .catch(error => {
-      //       console.error('Error:', error);
-      //     });
-      //     }
-
-
-          
-//       function bookTicket() {
-//         fetch('/bookTicket', {
-//             method: 'GET',
-//             headers: {
-//                 'Authorization': `Bearer ${getCookie('access_token')}` // 토큰을 헤더에 포함하여 전송
-//             }
-//         })
-//         .then(response => {
-//             if (response.ok) {
-//                 // 예매 페이지로 이동
-//                 window.location.href = '/seats';
-//             } else if (response.status === 401) {
-//                 // 인증되지 않은 경우 로그인 페이지로 이동
-//                 window.location.href = '/login';
-//             } else {
-//                 // 기타 다른 상태 코드에 대한 처리
-//                 console.error('Error:', response.statusText);
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//         });
-// }
-
-//       // 쿠키에서 토큰을 가져오는 함수
-//       function getCookie(name) {
-//           const value = `; ${document.cookie}`;
-//           const parts = value.split(`; ${name}=`);
-//           if (parts.length === 2) return parts.pop().split(';').shift();
-//       }
-
-
       </script>
     
     <button onclick="bookTicket()">예매하기</button>

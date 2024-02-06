@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>예매 성공</title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+    <header>
+        <!-- 로고 이미지 추가 -->
+        <img src="/public/images/ver2_black.png" alt="Ticketing Website Logo">
+   
+       <h1>Welcome to our Ticketing Website</h1>
+       <nav>
+         <ul>
+           <li><a href="/">Home</a></li>
+           <li><a href="/events">Events</a></li>
+           <!-- 로그인 상태에 따라 다르게 표시 -->
+           <% if (user) { %>
+             <li><a href="/profile">안녕하세요, <%= user.userName %>님!</a></li>
+             <li><a href="/logout">Logout</a></li>
+           <% } else { %>
+             <li><a href="/login">Login</a></li>
+           <% } %>
+         </ul>
+       </nav>
+     </header>
+
+     <main>
+        <h1>선예매가 완료되었습니다!</h1>
+        <p>이 페이지는 자동으로 닫힙니다. 몇 초 후에 메인화면으로 이동합니다.</p>
+
+     </main>
+
+
+
+  <script>
+    // 3초 후에 이전 페이지로 이동합니다.
+    setTimeout(() => {
+    //   history.back(); // 브라우저에서 이전 페이지로 이동
+        window.location.href = '/';
+    }, 3000);
+  </script>
+</body>
+</html>

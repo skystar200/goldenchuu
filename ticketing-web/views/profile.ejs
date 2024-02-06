@@ -10,10 +10,16 @@
 </head>
 <body>
   <header>
-    <!-- 로그아웃 버튼 -->
+    <img src="/public/images/ver2_black.png" alt="Ticketing Website Logo">
+   
+    <h1>Welcome to our Ticketing Website</h1>
+
     <nav>
       <ul>
-        <li><a href="/logout">로그아웃</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/logout">Logout</a></li>
+
       </ul>
     </nav>
   </header>
@@ -26,9 +32,83 @@
         <p>이메일: <%= user.email %></p>
         <p>전화번호: <%= user.phone %></p>
       <% } else { %>
-        <p>프로필을 볼 수 없습니다. 로그인이 필요합니다.</p>
+        <p>로그인이 필요합니다.</p>
       <% } %>
     </section>
+    <section id="booking-info">
+      <h2>예매내역 확인</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>좌석번호</th>
+          </tr>
+        </thead>
+        <tbody id="booking-table">
+          <!-- 여기에 예약 내역이 추가될 것입니다. -->
+        </tbody>
+      </table>
+      
+
+
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      // 서버에서 예약 내역을 가져오는 함수
+      const id = '<%= user.id %>';
+
+      async function getBookingInfo(id) {
+        try {
+          
+          const response = await axios.get(`/get-booking-info/${id}`); // 예약 내역을 가져오는 엔드포인트
+          if (response.status === 200) {
+            const seat_id = response.data.seat_id;
+            return seat_id;
+          } else {
+            throw new Error('Failed to fetch booking info');
+          }
+        } catch (error) {
+          console.error('Error fetching booking info:', error);
+          return [];
+        }
+      }
+
+      // 서버에서 예약 내역을 가져오는 함수
+        // async function getBookingInfo(id) {
+        //   try {
+        //     const response = await axios.get(`/get-booking-info/${id}`);
+        //     if (response.ok) {
+        //       const data = await response.json();
+        //       return data.seat_id;
+        //     } else {
+        //       throw new Error('Failed to fetch booking info');
+        //     }
+        //   } catch (error) {
+        //     console.error('Error fetching booking info:', error);
+        //     return null;
+        //   }
+        // }
+
+
+        window.onload = async function() {
+          const id = '<%= user.id %>'; // 현재 사용자의 id
+          const bookingTable = document.getElementById('booking-table');
+
+          try {
+            // 서버에서 예약 내역을 가져옴
+            const seat_id = await getBookingInfo(id);
+            
+            // 가져온 좌석번호를 예약 테이블에 추가
+            const row = bookingTable.insertRow();
+            const cell = row.insertCell();
+            cell.textContent = seat_id;
+          } catch (error) {
+            console.error('Error fetching booking info:', error);
+          }
+        };
+
+
+
+    </script>
   </main>
 
   <footer>
