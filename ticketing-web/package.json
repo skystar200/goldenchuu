@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "start": "run-p start-server start-redis",
+    "start": "run-p start-server start-flask",
     "start-server": "node index.js",
-    "start-redis": "cd config && python3 redis_py.py"
+    "start-flask": "cd flask && python3 redis_py.py"
   },
   "type": "commonjs",
   "name": "ticketing-web",

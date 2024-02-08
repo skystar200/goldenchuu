@@ -50,46 +50,6 @@
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // 사용자 인증을 위한 미들웨어 정의
-  // function isAuthenticated(req, res, next) {
-  //   if (req.cookies && req.cookies.access_token) { // 쿠키가 존재하는지 확인
-  //     const accessToken = req.cookies.access_token;
-      
-  //     try {
-  //       // 토큰 검증
-  //       const decoded = jwt.verify(accessToken, 'test_key'); // 발급할 때 사용한 비밀 키와 동일해야 함
-        
-  //       // 토큰에서 추출한 사용자 아이디
-  //       const userId = decoded.userId;
-  
-  //       // 데이터베이스에서 해당 사용자 정보 가져오기
-  //       const query = 'SELECT * FROM users WHERE userId = ?';
-  //       connection.query(query, [userId], (err, results) => {
-  //         if (err) {
-  //           console.error('쿼리 오류:', err);
-  //           res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-  //           return;
-  //         }
-  
-  //         if (results.length > 0) {
-  //           // 사용자 정보가 일치하는 경우
-  //           req.user = results[0]; // 요청 객체에 사용자 정보 추가
-  //           next(); // 다음 미들웨어로 이동
-  //         } else {
-  //           // 사용자 정보가 일치하지 않는 경우
-  //           res.status(401).json({ success: false, message: '사용자 정보가 일치하지 않습니다.' });
-  //         }
-  //       });
-  //     } catch (error) {
-  //       // 토큰이 유효하지 않은 경우
-  //       res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });
-        
-  //     }
-  //   } else {
-  //     res.redirect('/login'); // 쿠키가 없는 경우 로그인 페이지로 리다이렉션
-  //   }
-  // }
-
   const cors = require('cors');
   app.use(cors());
 
@@ -334,25 +294,6 @@
       res.status(500).send('Error fetching seat data.');
     }
   });
-  // app.post('/show-booking-info',async(req, res)=>{
-  //   try {
-  //     const id = req.session.id;
-  //     const response = await axios.get(`http://localhost:5000/get-booking-info/${id}`);
-      
-  //     if (response.status === 200) {    
-  //       const seat_id = response.data.seat_id;
-  //       res.status(200).json({ seat_id });
-  //     } else {
-  //       console.error('Failed to get seat data from Flask Server.');
-  //       res.status(500).send('Failed to get seat data from Flask Server.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error sending get-seat-data request to Flask Server:', error);
-  //     res.status(500).send('Error sending get-seat-data request to Flask Server.');
-  //   }
-
-  // })
-
 
   // 프로필-예매조회
   app.get('/get-booking-info/:id', async (req, res) =>{

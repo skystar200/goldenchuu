@@ -72,23 +72,6 @@
         }
       }
 
-      // 서버에서 예약 내역을 가져오는 함수
-        // async function getBookingInfo(id) {
-        //   try {
-        //     const response = await axios.get(`/get-booking-info/${id}`);
-        //     if (response.ok) {
-        //       const data = await response.json();
-        //       return data.seat_id;
-        //     } else {
-        //       throw new Error('Failed to fetch booking info');
-        //     }
-        //   } catch (error) {
-        //     console.error('Error fetching booking info:', error);
-        //     return null;
-        //   }
-        // }
-
-
         window.onload = async function() {
           const id = '<%= user.id %>'; // 현재 사용자의 id
           const bookingTable = document.getElementById('booking-table');

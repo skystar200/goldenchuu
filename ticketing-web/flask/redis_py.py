@@ -6,9 +6,21 @@ from awsConfig import get_dynamodb_resource
 app= Flask(__name__)
 CORS(app)  
 
-redis_host = "localhost"
-redis_port = 6379
-redis_password = "test123"
+
+# redis_host = "localhost"
+# redis_port = 6379
+# redis_password = "test123"
+elasticache_endpoint = 'init-redis-qepzp9.serverless.apn2.cache.amazonaws.com'
+elasticache_port = 6379
+
+client = redis.Redis(
+	host=elasticache_endpoint,
+	port=elasticache_port,
+	ssl=True,
+	decode_responses=True
+	)
+
+
 
 dynamodb = get_dynamodb_resource()
 
@@ -18,7 +30,8 @@ table = dynamodb.Table('init-db')
 def get_seat_data(sector,id):
     try:
         # Redis 클라이언트 생성
-        r = redis.Redis(host=redis_host, port=redis_port, password=redis_password)
+        # r = redis.Redis(host=client.host, port=client.port)
+        r= client
 
         resp = table.get_item(
             Key={
