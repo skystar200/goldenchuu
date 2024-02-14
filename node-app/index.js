@@ -3,8 +3,9 @@
   const path = require('path');
   const { fileURLToPath } = require('url');
   const { dirname } = require('path');
-  const bcrypt = require('bcrypt');
-  const connection = require('./config/db.js');
+  // const bcrypt = require('bcrypt');
+  
+  const connection = require('./db/db.js');
 
   const session = require('express-session');
   const bodyParser = require('body-parser');
@@ -21,6 +22,7 @@
   const LocalStrategy = require('passport-local').Strategy;
   const cookieParser = require('cookie-parser');
 
+  
   // EJS 템플릿 엔진 설정
   app.engine('ejs', ejs.renderFile);
   app.set('view engine', 'ejs');

@@ -7,18 +7,21 @@ app= Flask(__name__)
 CORS(app)  
 
 
-# redis_host = "localhost"
-# redis_port = 6379
-# redis_password = "test123"
-elasticache_endpoint = 'init-redis-qepzp9.serverless.apn2.cache.amazonaws.com'
-elasticache_port = 6379
+# redis_host = "3.34.192.127"
+redis_host = "3.34.192.127"
+redis_port = 6379
 
-client = redis.Redis(
-	host=elasticache_endpoint,
-	port=elasticache_port,
-	ssl=True,
-	decode_responses=True
-	)
+# redis_password = "test123"
+
+# elasticache_endpoint = 'init-test-ro.tfsu7r.ng.0001.apn2.cache.amazonaws.com'
+# elasticache_port = 6379
+
+# client = redis.Redis(
+# 	host=elasticache_endpoint,
+# 	port=elasticache_port,
+# 	ssl=True,
+# 	decode_responses=True
+# 	)
 
 
 
@@ -31,8 +34,9 @@ def get_seat_data(sector,id):
     try:
         # Redis 클라이언트 생성
         # r = redis.Redis(host=client.host, port=client.port)
-        r= client
-
+        # r= client
+        r = redis.Redis(host=redis_host, port=redis_port,)
+        
         resp = table.get_item(
             Key={
                 'users.id': int(id)
@@ -93,4 +97,4 @@ def get_booking_info(id):
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

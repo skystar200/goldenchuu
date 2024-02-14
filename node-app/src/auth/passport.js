@@ -2,7 +2,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
-const connection = require('../../config/db'); // 데이터베이스 연결 설정에 따라 경로 설정 필요
+const connection = require('../../db/db'); // 데이터베이스 연결 설정에 따라 경로 설정 필요
 
 passport.use(new LocalStrategy({
     usernameField: 'userId', // 사용자명 필드의 이름
