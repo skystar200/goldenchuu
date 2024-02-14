@@ -3,7 +3,7 @@
   const path = require('path');
   const { fileURLToPath } = require('url');
   const { dirname } = require('path');
-  // const bcrypt = require('bcrypt');
+  const bcrypt = require('bcrypt');
   
   const connection = require('./db/db.js');
 

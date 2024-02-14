@@ -1,8 +1,8 @@
 import boto3
 
 aws_config = {
-    "region": "",
-    "endpoint": ""
+    "region": "ap-northeast-2'",
+    "endpoint": "http://dynamodb.ap-northeast-2.amazonaws.com"
 }
 
 def get_dynamodb_resource(region_name='ap-northeast-2'):
