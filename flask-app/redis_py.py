@@ -7,22 +7,8 @@ app= Flask(__name__)
 CORS(app)  
 
 
-# redis_host = "3.34.192.127"
-redis_host = "3.34.192.127"
+redis_host = ""
 redis_port = 6379
-
-# redis_password = "test123"
-
-# elasticache_endpoint = 'init-test-ro.tfsu7r.ng.0001.apn2.cache.amazonaws.com'
-# elasticache_port = 6379
-
-# client = redis.Redis(
-# 	host=elasticache_endpoint,
-# 	port=elasticache_port,
-# 	ssl=True,
-# 	decode_responses=True
-# 	)
-
 
 
 dynamodb = get_dynamodb_resource()
