@@ -4,10 +4,7 @@ const mysql = require('mysql');
 const util = require('util');
 //RDS 연동
 const dbInfo = {
-    host: 'init-rds.c3oaiws8kipy.ap-northeast-2.rds.amazonaws.com',
-    user: 'admin',
-    password: 'test1234',
-    database: 'init_db',
+
 };
 
 // connection 변수 선언 및 초기화
