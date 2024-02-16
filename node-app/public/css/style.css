@@ -16,7 +16,7 @@
   header {
     background-color: #333;
     color: white;
-    padding: 0px;
+    padding: -0px;
     text-align: center;
     margin-top: 5px;
 
@@ -153,14 +153,6 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-  }
-  #logo {
-    width: 100px; /* 원하는 가로 크기로 조절하세요. */
-    height: 50px; /* 세로 크기는 가로 크기에 맞춥니다. */
-    position: absolute;
-    top: 10px; /* 원하는 상단 여백으로 조절하세요. */
-    left: 50px; /* 원하는 좌측 여백으로 조절하세요. */
-
   }
   #event-1{
     max-width: 100%; /* 이미지의 최대 너비를 부모 요소에 맞춤 */

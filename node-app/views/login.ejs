@@ -24,16 +24,17 @@
     <section id="login-container">
       <h2>로그인</h2>
       <label for="userId">ID</label>
+      <br>
       <input type="text" id="userId" required>
       <br>
       <label for="password">Password</label>
+      <br>
       <input type="password" id="password" required>
       <button onclick="login()">로그인</button>
     </section>
 
     <section id="join-container">
-      <h2>회원가입</h2>
-      <li><a href="/join">회원가입</a></li>
+      <a href="/join">회원가입</a>
     </section>
   </main>
 
@@ -61,7 +62,6 @@
         if (data.success) {
           alert('로그인이 완료되었습니다.');
           // 현재 페이지 URL을 확인하고, 리다이렉션 수행
-          // window.location.href = '/';
           const currentPageUrl = window.location.pathname;
           if (currentPageUrl === '/events/login') {
             window.location.href = '/seats';

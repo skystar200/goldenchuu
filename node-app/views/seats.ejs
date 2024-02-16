@@ -64,13 +64,12 @@
             console.log('Sector:', seat); 
             if (seat) {
               try {
-                // const id = '<%= user.id %>';
+              
                 const response = await axios.get(`/get-seat-data/${seat}/${id}`);
                 if (response.status === 200) {
-                  const seat_id = response.data.seat_id;
-                  // console.log('Data from Flask Server:', data);
+                  console.log('Data from Flask Server:', response.data);
+                  const seat_id = response.data.seat_id;           
                   console.log('Data from Flask Server:', seat_id);
-                  // if (data === null) {
                   if (seat_id === null) {
                     alert('예매 실패(매진)');
                   } else if (seat_id == -1) {
@@ -120,13 +119,8 @@
           });
         }
 
-
-
-
-
       </script>
-        <!-- export { updateSeatsUI }; -->
-        <!-- //브라우저 환경에서는 commonJS 스타일의 export를 사용할 수 없다. -->
+
 
         
       </main>

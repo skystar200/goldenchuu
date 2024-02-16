@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= event.title %></title>
+  <link rel="icon" href="../public/images/ver2.png">
+  <link rel="stylesheet" href="../public/css/style.css">
+  <style>
+    header img {
+      width: 300px;
+      height: 300px;
+  }
+  
+</style>
+</head>
+<body>
+    <header>
+        <img src="/public/images/ver2_black.png" alt="Ticketing Website Logo">
+   
+       <h1>Welcome to our Ticketing Website</h1>
+       <nav>
+         <ul>
+           <li><a href="/">Home</a></li>
+           <li><a href="/events">Events</a></li>
+           <!-- 로그인 상태에 따라 다르게 표시 -->
+           <% if (user) { %>
+             <li><a href="/profile">안녕하세요, <%= user.userName %>님!</a></li>
+             <li><a href="/logout">Logout</a></li>
+           <% } else { %>
+             <li><a href="/login">Login</a></li>
+           <% } %>
+         </ul>
+       </nav>
+     </header>
+     <main>
+        <h1><%= event.title %></h1>
+        <img src="<%= event.imageUrl %>" alt="<%= event.title %> Image " width="300" height="400">
+        <p>날짜: <%= event.date %></p>
+        <button onclick="bookTicket()">예매하기</button>
+
+        <script>
+
+            function bookTicket() {
+              fetch('/bookTicket')
+                .then(response => {
+                  if (response.redirected) {
+                    window.location.href = response.url; // 리다이렉트된 URL로 이동
+                  } else {
+                    console.error('Failed to redirect to login page.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error occurred while fetching bookTicket endpoint:', error);
+                });
+            }
+            </script>
+     </main>
+     <footer>
+        <p>&copy; 2024 Ticketing Website</p>
+      </footer>
+</body>
+
+</html>
