@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "echo \"hello stranger\""
+  },
   "type": "commonjs",
   "name": "ticketing-web",
   "version": "1.0.0",
