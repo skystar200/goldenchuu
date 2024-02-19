@@ -33,8 +33,8 @@ jobs:
         echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
         echo "ECR_REPOSITORY=wy-node" >> $GITHUB_ENV
         echo "IMAGE_TAG=${{ github.run_number }}" >> $GITHUB_ENV
-        echo "GIT_EMAIL=jydianasuh@gmail.com" >> $GITHUB_ENV
-        echo "GIT_NAME=deedaworld" >> $GITHUB_ENV
+        echo "GIT_EMAIL=skystar20095@gmail.com" >> $GITHUB_ENV
+        echo "GIT_NAME=skystar200" >> $GITHUB_ENV
     
     - name: Use Node.js v21.6
       uses: actions/setup-node@v3
@@ -64,7 +64,7 @@ jobs:
     - name: Checkout Deployment Repository
       uses: actions/checkout@v3
       with:
-        repository: deedaworld/wy-dep
+        repository: skystar200/wy-dep
         ref: main
         token: ${{ secrets.GH_TOKEN }}
 
