@@ -238,7 +238,7 @@
       id: 1,
       name: '이벤트1',
       date: '2024-01-13',
-      title: '길',
+      title: '주영언니 데뷔작 길',
       imageUrl: '/public/images/길.gif' 
     },
     { 
