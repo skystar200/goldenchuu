@@ -63,7 +63,7 @@ jobs:
     - name: Checkout Deployment Repository
       uses: actions/checkout@v3
       with:
-        repository: skystar200/wy-dep
+        repository: skystar200/byeol-web-dep
         ref: main
         token: ${{ secrets.GH_TOKEN }}
 
