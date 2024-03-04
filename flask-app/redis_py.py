@@ -7,7 +7,7 @@ app= Flask(__name__)
 CORS(app, supports_credentials=True)  
 
 
-redis_host = "3.34.192.127"
+redis_host = "init-redis-cluster.tfsu7r.ng.0001.apn2.cache.amazonaws.com"
 redis_port = 6379
 
 # elasticache_endpoint = 'init-test-ro.tfsu7r.ng.0001.apn2.cache.amazonaws.com'
