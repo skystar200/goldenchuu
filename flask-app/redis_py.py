@@ -13,7 +13,7 @@ redis_port = 6379
 dynamodb = get_dynamodb_resource()
 
 table = dynamodb.Table('init-dynamodb')
-@app.route('/')
+@app.route('/') 
 def hello_fnc():
     
     # r = redis.Redis(host=redis_host, port=redis_port)

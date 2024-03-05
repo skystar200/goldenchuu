@@ -310,7 +310,7 @@
       name: '이벤트2',
       date: '2024-03-15',
       title: '우쥬대스타의 "서울" 팬미팅',
-      imageUrl: '/public/images/우주.png' 
+      imageUrl: '/public/images/우주2.png' 
     },
     
   ];
