@@ -1,75 +1,131 @@
-<!-- views/join.ejs -->
+  <!-- views/join.ejs -->
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= pageTitle %></title>
-  <link rel="stylesheet" href="/public/css/style.css">
-</head>
-<body>
-  <header>
-    <h1><%= pageTitle %></h1>
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/events">Events</a></li>
-        <li><a href="/login">Login</a></li>
-      </ul>
-    </nav>
-  </header>
-  <main>  
-    <form action="/join" method="post">
-      <!-- <label for="userId"> 아이디 </label>
-      <input type="id" id="userId" name="userId" required>
-      <br>
-      <label for="password"> 비밀번호 </label>
-      <input type="password" id="password" name="password" required>
-      <br>
-      <label for="email"> 이메일 </label>
-      <input type="email" id="email" name="email" required>
-      <br>
-      <label for="userName"> 이름 </label>
-      <input type="text" id="userName" name="userName" required>
-      <br>
-      <label for="phone"> 핸드폰 번호 </label>
-      <input type="text" id="phone" name="phone" required> -->
-      <label for="userId"> 아이디 </label>
-      <input type="id" id="userId" name="userId" required>
-      <br>
-      <label for="password"> 비밀번호 </label>
-      <input type="password" id="password" name="password" required>
-      <br>
-      <label for="email"> 이메일 </label>
-      <input type="email" id="email" name="email" required>
-      <br>
-      <label for="userName"> 이름 </label>
-      <input type="text" id="userName" name="userName" required>
-      <br>
-      <label for="phone"> 핸드폰 번호 </label>
-      <input type="text" id="phone" name="phone" required>
-      <br>
-      <button id = "registerButton" type="submit">Register</button>
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/public/css/style.css">
+  </head>
+  <body>
+    <header>
+      <h1><%= pageTitle %></h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/events">Events</a></li>
+          <li><a href="/login">Login</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>  
+      <form action="/join" method="post">
+        <label for="userId"> 아이디 </label>
+        <input type="id" id="userId" name="userId" required>
+        <br>
+        <label for="password"> 비밀번호 </label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <label for="email"> 이메일 </label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="userName"> 이름 </label>
+        <input type="text" id="userName" name="userName" required>
+        <br>
+        <label for="phone"> 핸드폰 번호 </label>
+        <input type="text" id="phone" name="phone" required>
+        <br>
+        <button id = "registerButton" type="submit">Register</button>
 
 
-    </form>
-    
-  </main>
-  <footer>
-    <p>&copy; 2024 Ticketing Website</p>
-  </footer>
-  <script>
+      </form>
+      
+    </main>
+    <footer>
+      <p>&copy; 2024 Ticketing Website</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      function showError(message) {
+        alert(message);
+      }
+      function showNotification(message) {
+      alert(message); 
+  }
+
     const registerButton = document.getElementById('registerButton');
-    
+
     // 버튼 클릭 이벤트 리스너 추가
-    registerButton.addEventListener('click', function() {
-      // 알림을 띄움
-      alert('회원가입이 완료되었습니다.');
-      window.location.href = '/login';
+    registerButton.addEventListener('click', async function(event) {
+      event.preventDefault(); // 기본 동작 방지
+
+      const userId = document.getElementById('userId').value;
+      const password = document.getElementById('password').value;
+      const email = document.getElementById('email').value;
+      const userName = document.getElementById('userName').value;
+      const phone = document.getElementById('phone').value;
+
+      // 유효성 검사
+      if (userId.length < 4 || userId.length > 20) {
+        showError('아이디는 4글자 이상 20글자 이하로 입력해주세요.');
+        return;
+      }
+
+      if (password.length < 4) {
+        showError('비밀번호는 4글자 이상 입력해주세요.');
+        return;
+      }
+      if (!email) {
+        showError('이메일을 입력해주세요.');
+        return;
+      }
+
+      if (!userName) {
+        showError('이름을 입력해주세요.');
+        return;
+      }
+      if (!phone) {
+        showError('핸드폰번호를 입력해주세요.');
+        return;
+      }
+
+      try {
+        // 서버에 userId의 존재 여부를 요청하여 확인
+        const response = await axios.post('/checkExistingUserId', { userId: userId });
+
+        if (response.data) {
+          // 이미 존재하는 userId인 경우
+          showError('이미 존재하는 ID입니다.');
+        } else {
+          // 존재하지 않는 userId인 경우, 회원가입을 서버에 요청
+          const registerResponse = await axios.post('/join', {
+            userId: userId,
+            password: password,
+            email: email,
+            userName: userName,
+            phone: phone
+          });
+
+          if (registerResponse.status === 200) {
+            // 회원가입이 완료되었습니다. 알림을 띄우고, 로그인 페이지로 리다이렉션합니다.
+            showNotification('회원가입이 완료되었습니다.');
+            window.location.href = '/login';
+          } else {
+            // 서버에서 오류가 발생한 경우
+            showError('서버 오류로 회원가입을 완료할 수 없습니다.');
+          }
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+        showError('서버 오류로 회원가입을 완료할 수 없습니다.');
+      }
     });
 
-  </script>
 
-</body>
-</html>
+
+    </script>
+
+  </body>
+  </html>
+    

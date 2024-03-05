@@ -6,7 +6,6 @@
   const bcrypt = require('bcrypt');
   
   const connection = require('./db/db.js');
-
   const session = require('express-session');
   const bodyParser = require('body-parser');
   const ejs = require('ejs');
@@ -214,25 +213,90 @@
 
 
   // 회원가입
-  app.post('/join', (req, res) => {
-    console.log("registeruser");
-    const { userId, password, email, userName, phone} = req.body;
-    console.log(`Received data: ${JSON.stringify(req.body)}`);
-    // SQL 쿼리 작성
-    const sql = `INSERT INTO users (userId, password, email, userName, phone) VALUES (?, ?,?, ?,?)`;
-    // 쿼리 실행
-    connection.query(sql, [userId, password, email, userName, phone], (error, userResults) => {
-        if (error) {
-            console.error(error); // 에러 메시지를 콘솔에 출력
-            res.status(500).send(error.message); 
-            return;
-        }
-        // res.status(200).send('회원가입 완료!');
-        res.redirect('/login');
-        });
-        
+  // app.post('/join', (req, res) => {
+  //   console.log("registeruser");
+  //   const { userId, password, email, userName, phone} = req.body;
+  //   console.log(`Received data: ${JSON.stringify(req.body)}`);
+  //   // SQL 쿼리 작성
+  //   const sql = `INSERT INTO users (userId, password, email, userName, phone) VALUES (?, ?,?, ?,?)`;
+  //   // 쿼리 실행
+  //   connection.query(sql, [userId, password, email, userName, phone], (error, userResults) => {
+  //       if (error) {
+  //           console.error(error); // 에러 메시지를 콘솔에 출력
+  //           res.status(500).send(error.message); 
+  //           return;
+  //       }
+  //       // res.status(200).send('회원가입 완료!');
+  //       res.redirect('/login');
+  //       });
     
+    
+  // });
+
+  // 회원가입
+  app.post('/join', (req, res) => {
+    const { userId, password, email, userName, phone} = req.body;
+    
+    // 데이터베이스에서 해당 userId가 이미 존재하는지 확인
+    connection.query('SELECT * FROM users WHERE userId = ?', [userId], (err, results) => {
+      if (err) {
+        console.error('Error executing SELECT query: ' + err.stack);
+        res.status(500).send('서버 오류로 회원가입을 완료할 수 없습니다.');
+        return;
+      }
+      
+      if (results.length > 0) {
+        // 이미 존재하는 userId인 경우
+        res.status(400).send('이미 존재하는 ID입니다.');
+      } else {
+        // 존재하지 않는 userId인 경우, 회원가입 처리
+        const sql = `INSERT INTO users (userId, password, email, userName, phone) VALUES (?, ?, ?, ?, ?)`;
+        connection.query(sql, [userId, password, email, userName, phone], (error, userResults) => {
+          if (error) {
+            console.error(error); // 에러 메시지를 콘솔에 출력
+            res.status(500).send('서버 오류로 회원가입을 완료할 수 없습니다.');
+            return;
+          }
+          res.status(200).send('회원가입이 완료되었습니다.');
+        });
+      }
+    });
   });
+  // 사용자 중복 id 확인 함수
+  function checkExistingUserId(connection, userId) {
+    return new Promise((resolve, reject) => {
+      // 데이터베이스에서 해당 userId를 검색합니다.
+      connection.query('SELECT * FROM users WHERE userId = ?', [userId], (err, results) => {
+        if (err) {
+          // 에러가 발생한 경우, reject를 호출하여 오류를 반환합니다.
+          reject(err);
+        } else {
+          // 결과가 존재하는 경우, 이미 존재하는 userId이므로 resolve를 호출하여 true를 반환합니다.
+          if (results.length > 0) {
+            resolve(true);
+          } else {
+            // 결과가 존재하지 않는 경우, userId가 존재하지 않으므로 resolve를 호출하여 false를 반환합니다.
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
+
+  app.post('/checkExistingUserId', async (req, res) => {
+    const { userId } = req.body;
+    
+    try {
+      // checkExistingUserId 함수를 사용하여 userId의 존재 여부를 확인
+      const isExisting = await checkExistingUserId(connection, userId);
+      res.send(isExisting); // 클라이언트에게 결과를 반환
+    } catch (err) {
+      console.error('Error executing checkExistingUserId: ' + err.stack);
+      res.status(500).send('서버 오류로 처리할 수 없습니다.');
+    }
+  });
+  
+
   const events = [
     { 
       id: 1,
