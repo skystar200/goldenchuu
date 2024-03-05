@@ -31,7 +31,7 @@ jobs:
       id: set-var
       run: |
         echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
-        echo "ECR_REPOSITORY=wy-node" >> $GITHUB_ENV
+        echo "ECR_REPOSITORY=byeol-web" >> $GITHUB_ENV
         echo "IMAGE_TAG=${{ github.run_number }}" >> $GITHUB_ENV
         echo "GIT_EMAIL=skystar20095@gmail.com" >> $GITHUB_ENV
         echo "GIT_NAME=skystar200" >> $GITHUB_ENV
@@ -64,7 +64,7 @@ jobs:
     - name: Checkout Deployment Repository
       uses: actions/checkout@v3
       with:
-        repository: skystar200/ticket-dep
+        repository: skystar200/byeol-web-dep
         ref: main
         token: ${{ secrets.GH_TOKEN }}
 
