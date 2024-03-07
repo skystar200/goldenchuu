@@ -4,10 +4,10 @@ const mysql = require('mysql');
 const util = require('util');
 //RDS 연동
 const dbInfo = {
-    host: 'init-mysql.czuy8ksq2pce.ap-northeast-2.rds.amazonaws.com',
+    host: 'proxy-init-wouldyou.proxy-czuy8ksq2pce.ap-northeast-2.rds.amazonaws.com',
     user: 'admin',
     password: 'test1234',
-    database: 'init__rds',
+    database: 'init_wouldyou',
 };
 
 // connection 변수 선언 및 초기화
