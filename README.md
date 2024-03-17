@@ -44,7 +44,7 @@ CI/CD는 무중단 배포랑은 다른 개념입니다
 ### Service Architecture
 ![309661316-5eadb1fe-ab6c-4f57-91df-e921287b5555](https://github.com/skystar200/star-universe-circle/assets/80840476/421ebb4a-2089-46f1-a5d4-6dafcdc1a192)
 
-CI/CD Pipeline
+### CI/CD Pipeline
 ![CICD-pipeline (1)](https://github.com/skystar200/star-universe-circle/assets/80840476/559152a5-2499-436c-a4a6-63b226f1faaa)
 
 
