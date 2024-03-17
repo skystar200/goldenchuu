@@ -23,8 +23,8 @@ AWS의 Global Accelerator 는 TCP와 UDP의 응답 속도를 개선하는 서비
 
 ### 2️⃣ EKS+HPA를 통해 탄력성 확보
 AWS의 Managed Kubernetes Service인 EKS를 활용하여 컨테이너를 관리하고, HPA (Horizontal Pod Autoscaling)을 통해 Pod에 주어진 리소스의 임계점을 초과했을 때 자동으로 scale-out, scale-in이 진행되어 트래픽에 맞춘 유연성과 탄력성이 확보 될 수 있도록 구현
+![Untitled (5)](https://github.com/skystar200/star-universe-circle/assets/80840476/1a27e181-306c-4148-9316-524d2c53e4f9)
 
-image
 
 argoCD에서도 확인 가능한 scale-out으로 생성된 Pod
 
@@ -42,7 +42,9 @@ Github 저장소를 기반으로 소프트웨어 개발 Worflow를 자동화 할
 CI/CD는 무중단 배포랑은 다른 개념입니다
 ## 👣 03 | Architecture
 ### Service Architecture
-service-architecture (2)
+![309661316-5eadb1fe-ab6c-4f57-91df-e921287b5555](https://github.com/skystar200/star-universe-circle/assets/80840476/421ebb4a-2089-46f1-a5d4-6dafcdc1a192)
 
 CI/CD Pipeline
-cicd-pipeline
+![CICD-pipeline (1)](https://github.com/skystar200/star-universe-circle/assets/80840476/559152a5-2499-436c-a4a6-63b226f1faaa)
+
+
